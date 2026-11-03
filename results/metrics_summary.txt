@@ -1,0 +1,13 @@
+Chosen configuration : lr=4, hidden=64, log=False, maxEpochs=400
+Inputs (13)         : PM10, NO2, NH3, SO2, CO, O3, NOx, NO, Benzene, Toluene, Xylene, hour_sin, hour_cos
+Split                : train 6669, validation 1429, test 1430
+
+Test metrics (ug/m3)
+  mean baseline      : MSE=8471.17  RMSE=92.04  MAE=63.07  R2=-0.0006  bias=2.34
+  linear regression  : MSE=1010.79  RMSE=31.79  MAE=20.09  R2=0.8806  bias=1.50
+  MLP seed 1          : MSE=230.69  RMSE=15.19  MAE=10.39  R2=0.9728  bias=-1.47   (best epoch 650, band accuracy 73.4 %)
+  MLP seed 2          : MSE=255.92  RMSE=16.00  MAE=10.80  R2=0.9698  bias=-0.15   (best epoch 449, band accuracy 73.3 %)
+  MLP seed 3          : MSE=252.82  RMSE=15.90  MAE=10.66  R2=0.9701  bias=-0.73   (best epoch 478, band accuracy 74.4 %)
+  MLP seed 4          : MSE=273.33  RMSE=16.53  MAE=11.01  R2=0.9677  bias=-0.33   (best epoch 288, band accuracy 73.5 %)
+  MLP seed 5          : MSE=229.58  RMSE=15.15  MAE=10.30  R2=0.9729  bias=1.00   (best epoch 748, band accuracy 74.1 %)
+  MLP mean +/- sd    : RMSE 15.75 +/- 0.59, MAE 10.63 +/- 0.29, R2 0.9707 +/- 0.0022

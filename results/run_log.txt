@@ -1,0 +1,206 @@
+=== PM2.5 regression with a custom back-propagation MLP ===
+Mode: FULL
+
+--- 1. Back-propagation gradient check ---
+Gradient check (5-4-2 network, central differences, eps=1E-06)
+parameter             backprop       numerical  rel. error
+w_in[0,0]        6.821904E-003   6.821904E-003    1.2E-009
+w_in[0,1]       -7.814263E-003  -7.814263E-003    4.1E-011
+w_hid[0,0]       5.318535E-002   5.318535E-002    6.6E-011
+w_hid[0,1]       3.580276E-002   3.580276E-002    4.8E-011
+bias_hid[0]      6.928907E-003   6.928907E-003    8.0E-010
+bias_out[0]      9.636216E-002   9.636216E-002    1.6E-011
+bias_out[1]      6.486807E-002   6.486807E-002    5.7E-011
+... (34 parameters checked; only a few shown)
+max relative error = 3.55E-009, mean = 7.54E-010  ->  PASS
+
+--- 2. Data ---
+File: data/air-quality-data.csv
+Lines read: 9528, rows kept: 9528, dropped: malformed=0, bad date=0, missing/NaN=0, negative=0
+Period: 2019-05-31 00:00 to 2020-06-30 23:00
+Target: PM2.5;  predictors: PM10, NO2, NH3, SO2, CO, O3, NOx, NO, Benzene, Toluene, Xylene  + hour_sin, hour_cos
+
+Split (seed 42): train=6669  validation=1429  test=1430
+
+--- 3. Hyperparameter tuning (validation set only) ---
+[ 1/70] log=False hidden=4   lr=0.05  -> best val RMSE   24.800 ug/m3 at epoch 391  (1.3s)
+[ 2/70] log=False hidden=4   lr=0.1   -> best val RMSE   23.957 ug/m3 at epoch 391  (1.2s)
+[ 3/70] log=False hidden=4   lr=0.2   -> best val RMSE   22.175 ug/m3 at epoch 398  (1.3s)
+[ 4/70] log=False hidden=4   lr=0.5   -> best val RMSE   18.850 ug/m3 at epoch 391  (1.2s)
+[ 5/70] log=False hidden=4   lr=1     -> best val RMSE   18.457 ug/m3 at epoch 392  (1.4s)
+[ 6/70] log=False hidden=4   lr=2     -> best val RMSE   17.790 ug/m3 at epoch 399  (1.3s)
+[ 7/70] log=False hidden=4   lr=4     -> best val RMSE   16.557 ug/m3 at epoch 374  (1.3s)
+[ 8/70] log=False hidden=8   lr=0.05  -> best val RMSE   24.462 ug/m3 at epoch 393  (2.4s)
+[ 9/70] log=False hidden=8   lr=0.1   -> best val RMSE   23.355 ug/m3 at epoch 398  (2.4s)
+[10/70] log=False hidden=8   lr=0.2   -> best val RMSE   20.634 ug/m3 at epoch 400  (2.6s)
+[11/70] log=False hidden=8   lr=0.5   -> best val RMSE   18.268 ug/m3 at epoch 392  (2.3s)
+[12/70] log=False hidden=8   lr=1     -> best val RMSE   17.402 ug/m3 at epoch 399  (2.3s)
+[13/70] log=False hidden=8   lr=2     -> best val RMSE   17.082 ug/m3 at epoch 392  (2.3s)
+[14/70] log=False hidden=8   lr=4     -> best val RMSE   15.855 ug/m3 at epoch 399  (2.4s)
+[15/70] log=False hidden=16  lr=0.05  -> best val RMSE   24.509 ug/m3 at epoch 393  (4.6s)
+[16/70] log=False hidden=16  lr=0.1   -> best val RMSE   23.567 ug/m3 at epoch 398  (4.8s)
+[17/70] log=False hidden=16  lr=0.2   -> best val RMSE   20.827 ug/m3 at epoch 400  (4.6s)
+[18/70] log=False hidden=16  lr=0.5   -> best val RMSE   17.795 ug/m3 at epoch 400  (4.5s)
+[19/70] log=False hidden=16  lr=1     -> best val RMSE   16.680 ug/m3 at epoch 392  (4.5s)
+[20/70] log=False hidden=16  lr=2     -> best val RMSE   15.761 ug/m3 at epoch 376  (4.5s)
+[21/70] log=False hidden=16  lr=4     -> best val RMSE   15.557 ug/m3 at epoch 363  (4.6s)
+[22/70] log=False hidden=32  lr=0.05  -> best val RMSE   24.507 ug/m3 at epoch 398  (8.4s)
+[23/70] log=False hidden=32  lr=0.1   -> best val RMSE   23.712 ug/m3 at epoch 399  (8.4s)
+[24/70] log=False hidden=32  lr=0.2   -> best val RMSE   20.248 ug/m3 at epoch 400  (8.5s)
+[25/70] log=False hidden=32  lr=0.5   -> best val RMSE   18.030 ug/m3 at epoch 400  (8.1s)
+[26/70] log=False hidden=32  lr=1     -> best val RMSE   16.412 ug/m3 at epoch 400  (8.0s)
+[27/70] log=False hidden=32  lr=2     -> best val RMSE   15.491 ug/m3 at epoch 399  (8.1s)
+[28/70] log=False hidden=32  lr=4     -> best val RMSE   15.395 ug/m3 at epoch 378  (8.4s)
+[29/70] log=False hidden=64  lr=0.05  -> best val RMSE   24.599 ug/m3 at epoch 390  (15.6s)
+[30/70] log=False hidden=64  lr=0.1   -> best val RMSE   24.133 ug/m3 at epoch 390  (16.1s)
+[31/70] log=False hidden=64  lr=0.2   -> best val RMSE   21.605 ug/m3 at epoch 400  (16.1s)
+[32/70] log=False hidden=64  lr=0.5   -> best val RMSE   18.405 ug/m3 at epoch 400  (15.8s)
+[33/70] log=False hidden=64  lr=1     -> best val RMSE   17.209 ug/m3 at epoch 399  (16.0s)
+[34/70] log=False hidden=64  lr=2     -> best val RMSE   15.651 ug/m3 at epoch 399  (16.5s)
+[35/70] log=False hidden=64  lr=4     -> best val RMSE   15.010 ug/m3 at epoch 376  (16.2s)
+[36/70] log=True  hidden=4   lr=0.05  -> best val RMSE   24.691 ug/m3 at epoch 399  (1.2s)
+[37/70] log=True  hidden=4   lr=0.1   -> best val RMSE   23.834 ug/m3 at epoch 399  (1.2s)
+[38/70] log=True  hidden=4   lr=0.2   -> best val RMSE   22.589 ug/m3 at epoch 377  (1.3s)
+[39/70] log=True  hidden=4   lr=0.5   -> best val RMSE   22.632 ug/m3 at epoch 377  (1.3s)
+[40/70] log=True  hidden=4   lr=1     -> best val RMSE   20.720 ug/m3 at epoch 399  (1.2s)
+[41/70] log=True  hidden=4   lr=2     -> best val RMSE   19.964 ug/m3 at epoch 363  (1.2s)
+[42/70] log=True  hidden=4   lr=4     -> best val RMSE   20.032 ug/m3 at epoch 309  (1.3s)
+[43/70] log=True  hidden=8   lr=0.05  -> best val RMSE   24.599 ug/m3 at epoch 399  (2.3s)
+[44/70] log=True  hidden=8   lr=0.1   -> best val RMSE   23.242 ug/m3 at epoch 394  (2.3s)
+[45/70] log=True  hidden=8   lr=0.2   -> best val RMSE   22.069 ug/m3 at epoch 377  (2.3s)
+[46/70] log=True  hidden=8   lr=0.5   -> best val RMSE   20.267 ug/m3 at epoch 383  (2.3s)
+[47/70] log=True  hidden=8   lr=1     -> best val RMSE   18.146 ug/m3 at epoch 380  (2.4s)
+[48/70] log=True  hidden=8   lr=2     -> best val RMSE   17.568 ug/m3 at epoch 380  (2.3s)
+[49/70] log=True  hidden=8   lr=4     -> best val RMSE   17.466 ug/m3 at epoch 331  (2.3s)
+[50/70] log=True  hidden=16  lr=0.05  -> best val RMSE   23.916 ug/m3 at epoch 397  (4.4s)
+[51/70] log=True  hidden=16  lr=0.1   -> best val RMSE   22.541 ug/m3 at epoch 394  (4.4s)
+[52/70] log=True  hidden=16  lr=0.2   -> best val RMSE   21.464 ug/m3 at epoch 394  (4.6s)
+[53/70] log=True  hidden=16  lr=0.5   -> best val RMSE   19.426 ug/m3 at epoch 380  (4.5s)
+[54/70] log=True  hidden=16  lr=1     -> best val RMSE   17.895 ug/m3 at epoch 380  (4.4s)
+[55/70] log=True  hidden=16  lr=2     -> best val RMSE   16.713 ug/m3 at epoch 380  (4.6s)
+[56/70] log=True  hidden=16  lr=4     -> best val RMSE   16.722 ug/m3 at epoch 380  (4.5s)
+[57/70] log=True  hidden=32  lr=0.05  -> best val RMSE   24.806 ug/m3 at epoch 397  (8.4s)
+[58/70] log=True  hidden=32  lr=0.1   -> best val RMSE   23.783 ug/m3 at epoch 391  (8.4s)
+[59/70] log=True  hidden=32  lr=0.2   -> best val RMSE   21.815 ug/m3 at epoch 383  (8.2s)
+[60/70] log=True  hidden=32  lr=0.5   -> best val RMSE   19.839 ug/m3 at epoch 383  (8.5s)
+[61/70] log=True  hidden=32  lr=1     -> best val RMSE   18.282 ug/m3 at epoch 383  (8.5s)
+[62/70] log=True  hidden=32  lr=2     -> best val RMSE   17.054 ug/m3 at epoch 399  (8.4s)
+[63/70] log=True  hidden=32  lr=4     -> best val RMSE   17.041 ug/m3 at epoch 380  (8.6s)
+[64/70] log=True  hidden=64  lr=0.05  -> best val RMSE   25.069 ug/m3 at epoch 392  (16.0s)
+[65/70] log=True  hidden=64  lr=0.1   -> best val RMSE   23.668 ug/m3 at epoch 392  (16.4s)
+[66/70] log=True  hidden=64  lr=0.2   -> best val RMSE   22.250 ug/m3 at epoch 383  (16.0s)
+[67/70] log=True  hidden=64  lr=0.5   -> best val RMSE   20.278 ug/m3 at epoch 383  (16.3s)
+[68/70] log=True  hidden=64  lr=1     -> best val RMSE   18.514 ug/m3 at epoch 380  (16.1s)
+[69/70] log=True  hidden=64  lr=2     -> best val RMSE   16.820 ug/m3 at epoch 380  (16.0s)
+[70/70] log=True  hidden=64  lr=4     -> best val RMSE   16.408 ug/m3 at epoch 397  (16.6s)
+
+Best on validation: lr=4, hidden=64, log=False, maxEpochs=400  (val RMSE 15.010 ug/m3 at epoch 376)
+
+--- 4. Final training with the chosen hyperparameters ---
+Seed 1 (primary model) - epoch log, every 10th epoch:
+ epoch     train MSE       val MSE  val RMSE ug/m3
+     1      0.013232      0.008442          84.003
+    10      0.001412      0.000585          25.350
+    20      0.001076      0.000492          23.306
+    30      0.000909      0.000434          21.885
+    40      0.000776      0.000354          19.775
+    50      0.000716      0.000426          21.669
+    60      0.000678      0.000367          20.105
+    70      0.000652      0.000310          18.507
+    80      0.000637      0.000317          18.709
+    90      0.000619      0.000310          18.509
+   100      0.000593      0.000282          17.645
+   110      0.000587      0.000275          17.414
+   120      0.000568      0.000272          17.331
+   130      0.000555      0.000284          17.713
+   140      0.000544      0.000257          16.856
+   150      0.000528      0.000268          17.204
+   160      0.000521      0.000265          17.105
+   170      0.000511      0.000455          22.407
+   180      0.000505      0.000366          20.105
+   190      0.000498      0.000268          17.197
+   200      0.000494      0.000278          17.503
+   210      0.000491      0.000226          15.796
+   220      0.000480      0.000222          15.641
+   230      0.000479      0.000269          17.228
+   240      0.000476      0.000216          15.448
+   250      0.000475      0.000215          15.415
+   260      0.000466      0.000216          15.448
+   270      0.000462      0.000233          16.054
+   280      0.000458      0.000224          15.741
+   290      0.000455      0.000220          15.569
+   300      0.000449      0.000226          15.802
+   310      0.000450      0.000216          15.444
+   320      0.000444      0.000215          15.401
+   330      0.000444      0.000387          20.674
+   340      0.000442      0.000216          15.426
+   350      0.000440      0.000270          17.275
+   360      0.000441      0.000209          15.188
+   370      0.000434      0.000213          15.317
+   380      0.000431      0.000216          15.435
+   390      0.000428      0.000207          15.126
+   400      0.000435      0.000224          15.710
+   410      0.000425      0.000201          14.881
+   420      0.000427      0.000202          14.949
+   430      0.000423      0.000222          15.641
+   440      0.000423      0.000203          14.977
+   450      0.000423      0.000218          15.529
+   460      0.000415      0.000199          14.827
+   470      0.000417      0.000307          18.414
+   480      0.000417      0.000201          14.909
+   490      0.000415      0.000207          15.111
+   500      0.000412      0.000206          15.081
+   510      0.000411      0.000204          15.012
+   520      0.000411      0.000195          14.669
+   530      0.000410      0.000202          14.920
+   540      0.000409      0.000210          15.215
+   550      0.000405      0.000240          16.277
+   560      0.000405      0.000199          14.826
+   570      0.000407      0.000196          14.720
+   580      0.000401      0.000252          16.680
+   590      0.000401      0.000240          16.279
+   600      0.000404      0.000215          15.403
+   610      0.000400      0.000198          14.782
+   620      0.000402      0.000199          14.803
+   630      0.000399      0.000200          14.858
+   640      0.000401      0.000195          14.676
+   650      0.000396      0.000190          14.464
+   660      0.000395      0.000193          14.590
+   670      0.000395      0.000207          15.111
+   680      0.000396      0.000215          15.404
+   690      0.000394      0.000208          15.143
+   700      0.000393      0.000256          16.795
+Seed 1: stopped after 700 epochs (best epoch 650, val RMSE 14.464) in 27.9s   TEST MSE=230.69  RMSE=15.19  MAE=10.39  R2=0.9728  bias=-1.47
+Seed 2: stopped after 499 epochs (best epoch 449, val RMSE 15.285) in 20.0s   TEST MSE=255.92  RMSE=16.00  MAE=10.80  R2=0.9698  bias=-0.15
+Seed 3: stopped after 528 epochs (best epoch 478, val RMSE 14.930) in 21.0s   TEST MSE=252.82  RMSE=15.90  MAE=10.66  R2=0.9701  bias=-0.73
+Seed 4: stopped after 338 epochs (best epoch 288, val RMSE 15.347) in 14.0s   TEST MSE=273.33  RMSE=16.53  MAE=11.01  R2=0.9677  bias=-0.33
+Seed 5: stopped after 798 epochs (best epoch 748, val RMSE 14.583) in 31.7s   TEST MSE=229.58  RMSE=15.15  MAE=10.30  R2=0.9729  bias=1.00
+
+--- 5. Evaluation on the untouched test set ---
+Predict-the-mean baseline:        MSE=8471.17  RMSE=92.04  MAE=63.07  R2=-0.0006  bias=2.34
+Linear regression (reference):    MSE=1010.79  RMSE=31.79  MAE=20.09  R2=0.8806  bias=1.50
+MLP, seed 1 (primary):            MSE=230.69  RMSE=15.19  MAE=10.39  R2=0.9728  bias=-1.47
+MLP over 5 seeds: RMSE 15.75 +/- 0.59, MAE 10.63 +/- 0.29, R2 0.9707 +/- 0.0022
+
+Error by true PM2.5 band (primary model):
+band              rows       MAE      RMSE   bias(p-a)
+Good               246      4.99      6.21       -0.15
+Satisfactory       486      7.40      9.69        0.37
+Moderate           247     11.89     17.24        1.82
+Poor               136     13.57     17.59       -5.07
+Very Poor          218     15.34     20.18       -4.93
+Severe              97     19.66     26.95       -9.56
+
+Air-quality band classification derived from the predictions (primary model):
+Confusion matrix (rows = actual band, columns = predicted band)
+                       Good Satisfactory     Moderate         Poor    Very Poor       Severe   recall
+Good                    214           32            0            0            0            0    87 %
+Satisfactory             65          359           61            1            0            0    74 %
+Moderate                  0           55          151           28           13            0    61 %
+Poor                      0            2           48           69           17            0    51 %
+Very Poor                 0            0            1           38          172            7    79 %
+Severe                    0            0            0            0           12           85    88 %
+precision              77 %         80 %         58 %         51 %         80 %         92 %
+Band accuracy: 73.4 %   within one band: 98.8 %
+
+Result files written to: /home/claude/out3/AirQualityMLP/results
