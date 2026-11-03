@@ -135,8 +135,3 @@ vary the result by about +/-0.6 RMSE; the primary seed was fixed in advance (see
 `run_log.txt` (full console output), `training_log.csv` (+ `_seed2..5`), `tuning_results.csv`, `metrics_summary.txt`,
 `test_predictions.csv`, `loss_curve.png`, `actual_vs_predicted.png`, `tuning_raw.png`, `tuning_log_transform.png`.
 
-## Publishing to GitHub
-```
-git init && git add . && git commit -m "PM2.5 MLP regression"
-git remote add origin <your repo url> && git push -u origin main
-```
